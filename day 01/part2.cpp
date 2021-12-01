@@ -16,13 +16,13 @@ vector<int> parse_input() {
 
 int main() {
     vector<int> readings = parse_input();
+    vector<int> windows;
+    for (int i = 2; i < readings.size(); i++) {
+        windows.push_back(readings[i] + readings[i - 1] + readings[i - 2]);
+    }
     int count = 0;
-    for (int i = 3; i < readings.size(); i++) {
-        int window1 = readings[i-1] + readings[i-2] + readings[i-3];
-        int window2 = readings[i] + readings[i-1] + readings[i-2];
-        if (window2 > window1) {
-            count += 1;
-        }
+    for (int i = 1; i < windows.size(); i++) {
+        if (windows[i] > windows[i - 1]) count += 1;
     }
     cout << count;
     return 0;
