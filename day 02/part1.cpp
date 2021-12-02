@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 
-vector<pair<string, int>> parse_input() {
+auto parse_input() {
     ifstream input("input.txt");
     vector<pair<string, int>> instructions;
     string direction;
@@ -18,9 +18,9 @@ vector<pair<string, int>> parse_input() {
 }
 
 int main() {
-    vector<pair<string, int>> instructions = parse_input();
+    auto instructions = parse_input();
     int depth = 0, position = 0;
-    for (auto instruction : instructions) {
+    for (const auto& instruction : instructions) {
         if (instruction.first == "up")
             depth -= instruction.second;
         else if (instruction.first == "down")
