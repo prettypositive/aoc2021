@@ -18,7 +18,7 @@ char most_common_bit(const vector<string>& numbers, int position) {
     for (const string& number : numbers) {
         if (number[position] == '0')
             zeroes += 1;
-        else if (number[position] == '1')
+        else
             ones += 1;
     }
     if (zeroes > ones)
