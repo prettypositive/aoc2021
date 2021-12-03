@@ -26,12 +26,14 @@ auto most_common_bit(const vector<string>& numbers, int position) {
     else
         return '1';
 }
+
 auto least_common_bit(const vector<string>& numbers, int position) {
     if (most_common_bit(numbers, position) == '0')
         return '1';
     else
         return '0';
 }
+
 auto find_rating(vector<string> numbers, const string& rating_type) {
     for (int i = 0; i < numbers[0].size(); i++) {
         char target;
@@ -51,8 +53,8 @@ auto find_rating(vector<string> numbers, const string& rating_type) {
 
 int main() {
     auto numbers = parse_input();
-    string oxygen_rating = find_rating(numbers, "oxygen");
-    string co2_rating = find_rating(numbers, "co2");
+    auto oxygen_rating = find_rating(numbers, "oxygen");
+    auto co2_rating = find_rating(numbers, "co2");
     cout << stoi(oxygen_rating, nullptr, 2) * stoi(co2_rating, nullptr, 2);
     return 0;
 }
