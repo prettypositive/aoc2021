@@ -39,11 +39,11 @@ auto find_rating(vector<string> numbers, const string& rating_type) {
             target = most_common_bit(numbers, i);
         else if (rating_type == "co2")
             target = least_common_bit(numbers, i);
-        vector<string> new_numbers;
+        vector<string> good_numbers;
         for (const auto& number : numbers) {
-            if (number[i] == target) new_numbers.push_back(number);
+            if (number[i] == target) good_numbers.push_back(number);
         }
-        numbers = new_numbers;
+        numbers = good_numbers;
         if (numbers.size() == 1) break;
     }
     return numbers[0];
