@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -15,9 +14,9 @@ auto parse_input() {
 }
 
 auto count_bits(const vector<string>& numbers) {
-    map<int, int> counter;
-    for (int i = 0; i < numbers[0].size(); i++) counter[i] = 0;
-    for (const auto& number : numbers) {
+    vector<int> counter;
+    counter.resize(numbers[0].size());
+    for (const string& number : numbers) {
         for (int i = 0; i < number.size(); i++) {
             if (number[i] == '1') counter[i] += 1;
         }
@@ -25,10 +24,10 @@ auto count_bits(const vector<string>& numbers) {
     return counter;
 }
 
-void build_rates(const map<int, int>& counter, const vector<string>& numbers,
+void build_rates(const vector<int>& counter, const vector<string>& numbers,
                  string& gamma_rate, string& epsilon_rate) {
-    for (const auto& [key, value] : counter) {
-        if (value > (numbers.size() / 2)) {
+    for (const int& count : counter) {
+        if (count > (numbers.size() / 2)) {
             gamma_rate.push_back('1');
             epsilon_rate.push_back('0');
         } else {
