@@ -16,22 +16,13 @@ auto parse_input() {
 char most_common_bit(const vector<string>& numbers, int position) {
     int zeroes = 0, ones = 0;
     for (const string& number : numbers) {
-        if (number[position] == '0')
-            zeroes += 1;
-        else
-            ones += 1;
+        (number[position] == '0') ? zeroes += 1 : ones += 1;
     }
-    if (zeroes > ones)
-        return '0';
-    else
-        return '1';
+    return (zeroes > ones) ? '0' : '1';
 }
 
 char least_common_bit(const vector<string>& numbers, int position) {
-    if (most_common_bit(numbers, position) == '0')
-        return '1';
-    else
-        return '0';
+    return (most_common_bit(numbers, position) == '0') ? '1' : '0';
 }
 
 string find_rating(vector<string> numbers, const string& rating_type) {
