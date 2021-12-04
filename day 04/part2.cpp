@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -89,6 +90,8 @@ int compute_answer(const board_t& board, const vector<int>& called_numbers) {
 }
 
 int main() {
+    auto start = chrono::steady_clock::now();
+
     auto [numbers, boards] = parse_input();
     vector<int> called_numbers;
     vector<board_t> winners;
@@ -100,4 +103,8 @@ int main() {
         winners.insert(winners.end(), new_winners.begin(), new_winners.end());
     }
     cout << compute_answer(winners.back(), called_numbers);
+
+    auto end = chrono::steady_clock::now();
+    cout << " [" << chrono::duration<double, milli>(end - start).count()
+         << " ms]" << endl;
 }
