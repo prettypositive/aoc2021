@@ -58,6 +58,7 @@ bool check_column(const vector<int>& called_numbers, const board_t& board,
     }
     return (sum == 5) ? true : false;
 }
+
 auto check_boards(const vector<int>& called_numbers, vector<board_t>& boards) {
     vector<board_t> winners;
     for (int i = 0; i < boards.size(); i++) {
