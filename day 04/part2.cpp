@@ -8,6 +8,7 @@
 #include <vector>
 
 using namespace std;
+
 using board_t = array<array<int, 5>, 5>;
 
 tuple<vector<int>, vector<board_t>> parse_input() {
@@ -39,24 +40,24 @@ tuple<vector<int>, vector<board_t>> parse_input() {
 
 bool check_row(const vector<int>& called_numbers, const board_t& board,
                const int row) {
-    int sum = 0;
+    int marked = 0;
     for (int i = 0; i < 5; i++) {
         if (find(called_numbers.begin(), called_numbers.end(), board[row][i]) !=
             called_numbers.end())
-            sum += 1;
+            marked += 1;
     }
-    return (sum == 5) ? true : false;
+    return (marked == 5) ? true : false;
 }
 
 bool check_column(const vector<int>& called_numbers, const board_t& board,
                   const int column) {
-    int sum = 0;
+    int marked = 0;
     for (int i = 0; i < 5; i++) {
         if (find(called_numbers.begin(), called_numbers.end(),
                  board[i][column]) != called_numbers.end())
-            sum += 1;
+            marked += 1;
     }
-    return (sum == 5) ? true : false;
+    return (marked == 5) ? true : false;
 }
 
 auto check_boards(const vector<int>& called_numbers, vector<board_t>& boards) {
