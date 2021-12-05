@@ -47,39 +47,22 @@ int slope(const line_t& line) {
 auto draw_lines(const vector<line_t>& lines) {
     unordered_map<pair<int, int>, int, boost::hash<pair<int, int>>> points;
     for (const auto& line : lines) {
-        if (is_horizontal(line)) {
-            int direction = (line.first.first < line.second.first) ? 1 : -1;
-            int length = abs(line.first.first - line.second.first) + 1;
-            for (int i = 0; i < length; i++) {
-                pair point = {(line.first.first + (direction * i)),
-                              line.first.second};
-                points[point] += 1;
-            }
-        } else if (is_vertical(line)) {
-            int direction = (line.first.second < line.second.second) ? 1 : -1;
-            int length = abs(line.first.second - line.second.second) + 1;
-            for (int i = 0; i < length; i++) {
-                pair point = {line.first.first,
-                              (line.first.second + (direction * i))};
-                points[point] += 1;
-            }
+        int x_direction = (line.first.first < line.second.first) ? 1 : -1;
+        int y_direction = 0;
+        int length = abs(line.first.first - line.second.first) + 1;
+        if (is_vertical(line)) {
+            x_direction = 0;
+            y_direction = (line.first.second < line.second.second) ? 1 : -1;
+            length = abs(line.first.second - line.second.second) + 1;
         } else if (slope(line) == 1) {
-            int direction = (line.first.first < line.second.first) ? 1 : -1;
-            int length = abs(line.first.first - line.second.first) + 1;
-            for (int i = 0; i < length; i++) {
-                pair point = {(line.first.first + (direction * i)),
-                              (line.first.second + (direction * i))};
-                points[point] += 1;
-            }
-        } else {
-            int x_direction = (line.first.first < line.second.first) ? 1 : -1;
-            int y_direction = -x_direction;
-            int length = abs(line.first.first - line.second.first) + 1;
-            for (int i = 0; i < length; i++) {
-                pair point = {(line.first.first + (x_direction * i)),
-                              (line.first.second + (y_direction * i))};
-                points[point] += 1;
-            }
+            y_direction = x_direction;
+        } else if (slope(line) == -1) {
+            y_direction = -x_direction;
+        }
+        for (int i = 0; i < length; i++) {
+            pair point = {(line.first.first + (x_direction * i)),
+                          (line.first.second + (y_direction * i))};
+            points[point] += 1;
         }
     }
     return points;
