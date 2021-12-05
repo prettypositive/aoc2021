@@ -1,9 +1,10 @@
+#include <boost/functional/hash.hpp>
 #include <chrono>
 #include <cmath>
 #include <fstream>
 #include <iostream>
-#include <set>
 #include <sstream>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 using namespace std;
@@ -17,10 +18,9 @@ auto parse_input() {
     vector<line_t> lines;
     while (input >> x1y1 >> delimiter >> x2y2) {
         string rx1, ry1, rx2, ry2;
-        stringstream ss(x1y1);
+        stringstream ss(x1y1), ss2(x2y2);
         getline(ss, rx1, ',');
         getline(ss, ry1, ',');
-        stringstream ss2(x2y2);
         getline(ss2, rx2, ',');
         getline(ss2, ry2, ',');
         int x1 = stoi(rx1), y1 = stoi(ry1);
@@ -31,11 +31,6 @@ auto parse_input() {
     return lines;
 }
 
-bool is_orthogonal(const line_t& line) {
-    return ((line.first.first == line.second.first) !=
-            (line.first.second == line.second.second));
-}
-
 bool is_horizontal(const line_t& line) {
     return (line.first.second == line.second.second);
 }
@@ -44,12 +39,8 @@ bool is_vertical(const line_t& line) {
     return (line.first.first == line.second.first);
 }
 
-int main() {
-    auto start = chrono::steady_clock::now();
-
-    auto lines = parse_input();
-    vector<pair<int, int>> all_points;
-    set<pair<int, int>> unique_points;
+auto draw_lines(const vector<line_t>& lines) {
+    unordered_map<pair<int, int>, int, boost::hash<pair<int, int>>> points;
     for (const auto& line : lines) {
         int direction, length;
         if (is_horizontal(line)) {
@@ -58,8 +49,7 @@ int main() {
             for (int i = 0; i < length; i++) {
                 pair point = {(line.first.first + (direction * i)),
                               line.first.second};
-                unique_points.insert(point);
-                all_points.push_back(point);
+                points[point] += 1;
             }
         } else if (is_vertical(line)) {
             direction = (line.first.second < line.second.second) ? 1 : -1;
@@ -67,15 +57,21 @@ int main() {
             for (int i = 0; i < length; i++) {
                 pair point = {line.first.first,
                               (line.first.second + (direction * i))};
-                unique_points.insert(point);
-                all_points.push_back(point);
+                points[point] += 1;
             }
         }
     }
+    return points;
+}
+
+int main() {
+    auto start = chrono::steady_clock::now();
+
+    auto lines = parse_input();
+    auto points = draw_lines(lines);
     int duplicate_points = 0;
-    for (const auto& point : unique_points) {
-        if (count(all_points.begin(), all_points.end(), point) > 1)
-            duplicate_points += 1;
+    for (const auto& [point, value] : points) {
+        if (value > 1) duplicate_points += 1;
     }
     cout << duplicate_points;
 
