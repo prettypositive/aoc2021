@@ -18,9 +18,7 @@ auto parse_input() {
 auto timestep(const array<int64_t, 9>& population) {
     array<int64_t, 9> new_population = {};
     for (int i = 0; i < 9; i++) {
-        int x = i - 1;
-        if (x == -1) x = 8;
-        new_population[x] = population[i];
+        new_population[i] = population[(i + 1) % 9];
     }
     new_population[6] += population[0];
     return new_population;
