@@ -63,12 +63,12 @@ bool check_column(const vector<int>& called_numbers, const board_t& board,
 
 auto check_boards(const vector<int>& called_numbers, vector<board_t>& boards) {
     vector<board_t> winners;
-    for (int i = 0; i < boards.size(); i++) {
-        for (int j = 0; j < 5; j++) {
-            if (check_row(called_numbers, boards[i], j) ||
-                check_column(called_numbers, boards[i], j)) {
-                winners.push_back(boards[i]);
-                boards.erase(boards.begin() + i);
+    for (auto it = boards.begin(); it != boards.end(); it++) {
+        for (int i = 0; i < 5; i++) {
+            if (check_row(called_numbers, *it, i) ||
+                check_column(called_numbers, *it, i)) {
+                winners.push_back(*it);
+                boards.erase(it--);
                 break;
             }
         }
