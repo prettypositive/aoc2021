@@ -1,7 +1,6 @@
-#include <stdint.h>
-
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 using namespace std;
@@ -31,7 +30,7 @@ int main() {
     auto start = chrono::steady_clock::now();
 
     auto population = parse_input();
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < 80; i++) {
         auto new_population = timestep(population);
         population = new_population;
     }
