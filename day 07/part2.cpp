@@ -25,11 +25,8 @@ int main() {
     fuel.resize(highest);
     for (int i = 0; i < fuel.size(); i++) {
         for (const auto& position : positions) {
-            int cost = 0;
-            for (int j = 1; j < abs(position - i) + 1; j++) {
-                cost += j;
-            }
-            fuel[i] += cost;
+            int difference = abs(position - i);
+            fuel[i] += (difference * (difference + 1)) / 2;
         }
     }
     cout << *min_element(fuel.begin(), fuel.end());
