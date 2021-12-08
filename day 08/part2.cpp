@@ -59,12 +59,14 @@ auto solve_segments(const vector<string>& digits) {
             counter[segment] += 1;
         }
     }
+
     unordered_map<char, char> segments;
     for (const auto& [key, value] : counter) {
         if (value == 4) segments['e'] = key;
         if (value == 6) segments['b'] = key;
         if (value == 9) segments['f'] = key;
     }
+    // loop twice because we need segment b before solving segment d
     for (const auto& [key, value] : counter) {
         if (value == 7) {
             if ((len_2.find(key) == string::npos) &&
