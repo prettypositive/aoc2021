@@ -22,7 +22,7 @@ struct Point {
     struct hash {
         size_t operator()(const Point& point) const {
             size_t x_hash = std::hash<int>()(point.x);
-            size_t y_hash = std::hash<int>()(point.y);
+            size_t y_hash = std::hash<int>()(point.y) << 1;
             return (x_hash ^ y_hash);
         }
     };
