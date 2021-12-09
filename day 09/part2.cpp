@@ -21,9 +21,10 @@ struct Point {
 
     struct hash {
         size_t operator()(const Point& point) const {
-            size_t x_hash = std::hash<int>()(point.x);
-            size_t y_hash = std::hash<int>()(point.y) << 1;
-            return (x_hash ^ y_hash);
+            int hash = 17;
+            hash = hash * 31 + point.x;
+            hash = hash * 31 + point.y;
+            return hash;
         }
     };
 };
