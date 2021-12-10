@@ -54,10 +54,10 @@ int64_t score_line(const string& line, const vector<char>& stack) {
     }
     return score;
 }
+
 int64_t solve_puzzle() {
     auto lines = parse_input();
     vector<int64_t> scores;
-
     for (const auto& line : lines) {
         vector<char> stack;
         if (is_valid_line(line, stack)) {
