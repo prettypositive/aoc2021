@@ -47,10 +47,10 @@ char check_line(const string& line) {
 int solve_puzzle() {
     auto lines = parse_input();
     int score = 0;
+    unordered_map<char, int> scores = {
+        {'0', 0}, {')', 3}, {']', 57}, {'}', 1197}, {'>', 25137}};
     for (const auto& line : lines) {
         char killer = check_line(line);
-        unordered_map<char, int> scores = {
-            {'0', 0}, {')', 3}, {']', 57}, {'}', 1197}, {'>', 25137}};
         score += scores[killer];
     }
     return score;
