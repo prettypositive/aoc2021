@@ -39,10 +39,11 @@ int traverse_cave(cave_t& cave, path_t path = {},
                   const std::string& current_node = "start",
                   bool used = false) {
     if (current_node == "end") return 1;
-    int paths = 0;
+
     auto [_, unique] = path.insert(current_node);
     if (!unique && std::islower(current_node[0])) used = true;
 
+    int paths = 0;
     for (const auto& node : cave[current_node]) {
         if (is_visitable(path, node, used))
             paths += traverse_cave(cave, path, node, used);
