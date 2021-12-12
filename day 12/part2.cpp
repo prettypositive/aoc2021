@@ -35,28 +35,24 @@ bool is_visitable(const path_t& path, const std::string& node,
     return false;
 }
 
-void traverse_cave(cave_t& cave, int& paths, path_t path = {},
-                   const std::string& current_node = "start",
-                   bool used = false) {
-    if (current_node == "end") {
-        ++paths;
-        return;
-    }
-
+int traverse_cave(cave_t& cave, path_t path = {},
+                  const std::string& current_node = "start",
+                  bool used = false) {
+    if (current_node == "end") return 1;
+    int paths = 0;
     auto [_, unique] = path.insert(current_node);
     if (!unique && std::islower(current_node[0])) used = true;
 
     for (const auto& node : cave[current_node]) {
         if (is_visitable(path, node, used))
-            traverse_cave(cave, paths, path, node, used);
+            paths += traverse_cave(cave, path, node, used);
     }
-    return;
+    return paths;
 }
 
 auto solve_puzzle() {
     auto cave = parse_input();
-    int paths = 0;
-    traverse_cave(cave, paths);
+    int paths = traverse_cave(cave);
     return paths;
 }
 
