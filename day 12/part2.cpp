@@ -42,6 +42,7 @@ int traverse_cave(const cave_t& cave, path_t path = {},
         auto [_, unique] = path.insert(current_node);
         if (!unique) used = true;
     }
+
     int paths = 0;
     for (const auto& node : cave.at(current_node)) {
         if (is_visitable(path, node, used))
