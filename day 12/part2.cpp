@@ -4,9 +4,10 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
-using path_t = std::vector<std::string>;
+using path_t = std::unordered_set<std::string>;
 using cave_t = std::unordered_map<std::string, std::vector<std::string>>;
 
 auto parse_input() {
@@ -25,43 +26,38 @@ auto parse_input() {
     return cave;
 }
 
-bool is_visitable(const path_t& path, const std::string& node) {
+bool is_visitable(const path_t& path, const std::string& node,
+                  const bool& used) {
     if (node == "start") return false;
-    if (node == "end") return true;
     if (std::isupper(node[0])) return true;
-    // only lowercase nodes remain
-    std::unordered_map<std::string, int> counter;
-    for (const auto& path_node : path) {
-        if (std::islower(path_node[0])) counter[path_node] += 1;
-    }
-    bool used = false;
-    for (const auto& [_, value] : counter) {
-        if (value > 1) used = true;
-    }
-    if (!used) return true;  // if no small caves visited twice
-    if (!counter.contains(node))
-        return true;  // otherwise, if current node not visited yet
-    return false;     // otherwise, double visit already used up
+    if (!used) return true;
+    if (!path.contains(node)) return true;
+    return false;
 }
 
-void traverse_cave(cave_t& cave, std::vector<path_t>& paths, path_t path = {},
-                   const std::string& current_node = "start") {
-    path.push_back(current_node);
+void traverse_cave(cave_t& cave, int& paths, path_t path = {},
+                   const std::string& current_node = "start",
+                   bool used = false) {
     if (current_node == "end") {
-        paths.push_back(path);
+        ++paths;
         return;
     }
+
+    auto [_, unique] = path.insert(current_node);
+    if (!unique && std::islower(current_node[0])) used = true;
+
     for (const auto& node : cave[current_node]) {
-        if (is_visitable(path, node)) traverse_cave(cave, paths, path, node);
+        if (is_visitable(path, node, used))
+            traverse_cave(cave, paths, path, node, used);
     }
     return;
 }
 
 auto solve_puzzle() {
     auto cave = parse_input();
-    std::vector<path_t> paths;
+    int paths = 0;
     traverse_cave(cave, paths);
-    return paths.size();
+    return paths;
 }
 
 int main() {
