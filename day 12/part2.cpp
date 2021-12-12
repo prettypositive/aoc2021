@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include <vector>
 
-using path_t = std::unordered_set<std::string>;
+using path_t = std::unordered_map<std::string, int>;
 using cave_t = std::unordered_map<std::string, std::vector<std::string>>;
 
 auto parse_input() {
@@ -26,34 +26,34 @@ auto parse_input() {
     return cave;
 }
 
-bool is_visitable(const path_t& path, const std::string& node,
+bool is_visitable(path_t& path, const std::string& node,
                   const bool& used) {
     if (node == "start") return false;
     if (!used) return true;
-    if (path.contains(node)) return false;
+    if (std::isupper(node[0])) return true;
+    if (path[node] > 0) return false;
     return true;
 }
 
-int traverse_cave(const cave_t& cave, path_t path = {},
+int traverse_cave(const cave_t& cave, path_t& path,
                   const std::string& current_node = "start",
                   bool used = false) {
     if (current_node == "end") return 1;
-    if (std::islower(current_node[0])) {
-        auto [_, unique] = path.insert(current_node);
-        if (!unique) used = true;
-    }
-
+    path[current_node] += 1;
+    if (std::islower(current_node[0]) && (path[current_node] == 2)) used = true;
     int paths = 0;
     for (const auto& node : cave.at(current_node)) {
         if (is_visitable(path, node, used))
             paths += traverse_cave(cave, path, node, used);
     }
+    path[current_node] -= 1;
     return paths;
 }
 
 auto solve_puzzle() {
     auto cave = parse_input();
-    int paths = traverse_cave(cave);
+    path_t path;
+    int paths = traverse_cave(cave, path);
     return paths;
 }
 
