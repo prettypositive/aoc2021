@@ -29,22 +29,21 @@ auto parse_input() {
 bool is_visitable(const path_t& path, const std::string& node,
                   const bool& used) {
     if (node == "start") return false;
-    if (std::isupper(node[0])) return true;
     if (!used) return true;
-    if (!path.contains(node)) return true;
-    return false;
+    if (path.contains(node)) return false;
+    return true;
 }
 
-int traverse_cave(cave_t& cave, path_t path = {},
+int traverse_cave(const cave_t& cave, path_t path = {},
                   const std::string& current_node = "start",
                   bool used = false) {
     if (current_node == "end") return 1;
-
-    auto [_, unique] = path.insert(current_node);
-    if (!unique && std::islower(current_node[0])) used = true;
-
+    if (std::islower(current_node[0])) {
+        auto [_, unique] = path.insert(current_node);
+        if (!unique) used = true;
+    }
     int paths = 0;
-    for (const auto& node : cave[current_node]) {
+    for (const auto& node : cave.at(current_node)) {
         if (is_visitable(path, node, used))
             paths += traverse_cave(cave, path, node, used);
     }
