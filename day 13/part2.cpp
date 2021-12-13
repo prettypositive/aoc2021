@@ -82,20 +82,27 @@ std::tuple<points_t, std::vector<Fold>> parse_input() {
 }
 
 void fold_points(points_t& points, const Fold& fold) {
+    points_t new_points;
     for (const auto& point : points) {
         Point new_point;
         if (fold.axis == 'y') {
-            if (point.y < fold.line) continue;
-            new_point.x = point.x;
-            new_point.y = fold.line - (point.y - fold.line);
+            if (point.y < fold.line) {
+                new_point = point;
+            } else {
+                new_point.x = point.x;
+                new_point.y = fold.line - (point.y - fold.line);
+            }
         } else if (fold.axis == 'x') {
-            if (point.x < fold.line) continue;
-            new_point.y = point.y;
-            new_point.x = fold.line - (point.x - fold.line);
+            if (point.x < fold.line) {
+                new_point = point;
+            } else {
+                new_point.y = point.y;
+                new_point.x = fold.line - (point.x - fold.line);
+            }
         }
-        points.insert(new_point);
-        points.erase(point);
+        new_points.insert(new_point);
     }
+    points = new_points;
 }
 
 auto convert_to_ascii(const points_t& points) {
@@ -109,13 +116,13 @@ auto convert_to_ascii(const points_t& points) {
                 points.begin(), points.end(),
                 [](const Point& a, const Point& b) { return a.y < b.y; })
                 ->y;
-    for (int i = 0; i < max_y+1; i++) {
-        std::string blank(max_x*2, '.');
+    for (int i = 0; i < max_y + 1; i++) {
+        std::string blank(max_x * 2, '.');
         output_v.push_back(blank);
     }
     for (const auto& point : points) {
-        output_v[point.y][point.x*2] = '#';
-        output_v[point.y][point.x*2+1] = '#';
+        output_v[point.y][point.x * 2] = '#';
+        output_v[point.y][point.x * 2 + 1] = '#';
     }
     std::string output;
     for (const auto& line : output_v) {
