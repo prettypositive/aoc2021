@@ -110,11 +110,12 @@ auto convert_to_ascii(const points_t& points) {
                 [](const Point& a, const Point& b) { return a.y < b.y; })
                 ->y;
     for (int i = 0; i < max_y+1; i++) {
-        std::string blank(max_x, '.');
+        std::string blank(max_x*2, '.');
         output_v.push_back(blank);
     }
     for (const auto& point : points) {
-        output_v[point.y][point.x] = '#';
+        output_v[point.y][point.x*2] = '#';
+        output_v[point.y][point.x*2+1] = '#';
     }
     std::string output;
     for (const auto& line : output_v) {
