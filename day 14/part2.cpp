@@ -57,6 +57,7 @@ auto solve_puzzle() {
     std::sort(counts.begin(), counts.end());
 
     // i have NO IDEA how this is off by 1 but it is
+    // and not for the example!
     return (counts.back() - counts.front() - 1);
 }
 
