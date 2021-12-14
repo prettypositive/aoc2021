@@ -10,10 +10,11 @@
 using polymer_t = std::unordered_map<char, std::unordered_map<char, int64_t>>;
 using rules_t = std::unordered_map<char, std::unordered_map<char, char>>;
 
-std::tuple<polymer_t, rules_t> parse_input() {
+std::tuple<char, polymer_t, rules_t> parse_input() {
     std::ifstream input("input.txt");
     std::string raw;
     std::getline(input, raw);
+    char first = raw[0];  // first character doesn't get counted at the end
     polymer_t polymer;
     for (int i = 1; i < raw.size(); i++) {
         polymer[raw[i - 1]][raw[i]] += 1;
@@ -24,7 +25,7 @@ std::tuple<polymer_t, rules_t> parse_input() {
         rules[pair[0]][pair[1]] = insert[0];
     }
     input.close();
-    return {polymer, rules};
+    return {first, polymer, rules};
 }
 
 auto apply_rules(rules_t& rules, const polymer_t& polymer) {
@@ -40,7 +41,7 @@ auto apply_rules(rules_t& rules, const polymer_t& polymer) {
 }
 
 auto solve_puzzle() {
-    auto [polymer, rules] = parse_input();
+    auto [first, polymer, rules] = parse_input();
     for (int i = 0; i < 40; i++) {
         polymer = apply_rules(rules, polymer);
     }
@@ -50,15 +51,15 @@ auto solve_puzzle() {
             counter[key2] += value2;
         }
     }
+    counter[first] += 1;  // can't think of a better way to fix this
     std::vector<int64_t> counts;
     for (const auto& [key, value] : counter) {
         counts.push_back(value);
+        std::cout << key << " " << value << std::endl;
     }
     std::sort(counts.begin(), counts.end());
 
-    // i have NO IDEA how this is off by 1 but it is
-    // and not for the example!
-    return (counts.back() - counts.front() - 1);
+    return (counts.back() - counts.front());
 }
 
 int main() {
