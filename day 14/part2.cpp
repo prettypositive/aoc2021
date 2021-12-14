@@ -46,16 +46,15 @@ auto solve_puzzle() {
         polymer = apply_rules(rules, polymer);
     }
     std::unordered_map<char, int64_t> counter;
+    counter[first] += 1;  // can't think of a better way to fix this
     for (const auto& [key, value] : polymer) {
         for (const auto& [key2, value2] : value) {
             counter[key2] += value2;
         }
     }
-    counter[first] += 1;  // can't think of a better way to fix this
     std::vector<int64_t> counts;
     for (const auto& [key, value] : counter) {
         counts.push_back(value);
-        std::cout << key << " " << value << std::endl;
     }
     std::sort(counts.begin(), counts.end());
 
