@@ -6,6 +6,7 @@
 #include <numeric>
 #include <queue>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 struct Node {
@@ -23,12 +24,6 @@ struct Node {
     int value;
 
     Node() {}
-
-    Node(int x, int y, int value) {
-        this->x = x;
-        this->y = y;
-        this->value = value;
-    }
 
     Node(int x, int y) {
         this->x = x;
@@ -63,15 +58,13 @@ auto parse_input() {
 
     std::vector<Node> nodes;
     int max_x = grid[0].size(), max_y = grid.size();
-    for (int y = 0; y < grid.size(); y++) {
-        for (int x = 0; x < grid[0].size(); x++) {
+    for (int y = 0; y < max_y; y++) {
+        for (int x = 0; x < max_x; x++) {
             for (int i = 0; i < 5; i++) {
                 for (int j = 0; j < 5; j++) {
                     auto node = Node((x + (max_x * i)), (y + (max_y * j)));
-                    int value = (grid[y][x] - '0');
-                    value += (i + j);
-                    if (value > 9) value -= 9;
-                    node.value = value;
+                    node.value = (grid[y][x] - '0') + (i + j);
+                    if (node.value > 9) node.value -= 9;
                     nodes.push_back(node);
                 }
             }
@@ -82,6 +75,7 @@ auto parse_input() {
 
 auto build_graph(const std::vector<Node>& nodes) {
     graph_t graph;
+    std::unordered_set<Node, Node::hash> nodes_s(nodes.begin(), nodes.end());
     for (auto& node : nodes) {
         std::vector<Node> possibilities = {
             Node(node.x, node.y + 1),
@@ -90,8 +84,8 @@ auto build_graph(const std::vector<Node>& nodes) {
             Node(node.x - 1, node.y),
         };
         for (const auto& possibility : possibilities) {
-            auto found = std::find(nodes.begin(), nodes.end(), possibility);
-            if (found != nodes.end()) graph[node].push_back(*found);
+            auto found = nodes_s.find(possibility);
+            if (found != nodes_s.end()) graph[node].push_back(*found);
         }
     }
     return graph;
