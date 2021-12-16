@@ -1,4 +1,6 @@
 #include <algorithm>
+#include <bitset>
+#include <cctype>
 #include <chrono>
 #include <cstdint>
 #include <fstream>
@@ -8,41 +10,11 @@
 #include <vector>
 
 std::string hex_char_to_binary(char c) {
-    switch (c) {
-        case '0':
-            return "0000";
-        case '1':
-            return "0001";
-        case '2':
-            return "0010";
-        case '3':
-            return "0011";
-        case '4':
-            return "0100";
-        case '5':
-            return "0101";
-        case '6':
-            return "0110";
-        case '7':
-            return "0111";
-        case '8':
-            return "1000";
-        case '9':
-            return "1001";
-        case 'A':
-            return "1010";
-        case 'B':
-            return "1011";
-        case 'C':
-            return "1100";
-        case 'D':
-            return "1101";
-        case 'E':
-            return "1110";
-        case 'F':
-            return "1111";
+    if (std::isalpha(c)) {
+        return std::bitset<4>(c - 55).to_string();
+    } else {
+        return std::bitset<4>(c - '0').to_string();
     }
-    return "";
 }
 
 enum Op {
@@ -56,6 +28,11 @@ enum Op {
     EQUAL = 7
 };
 
+enum LengthType {
+    BITS = '0',
+    PACKETS = '1',
+};
+
 auto parse_input() {
     std::ifstream input("input.txt");
     char c;
@@ -67,8 +44,9 @@ auto parse_input() {
     return packet;
 }
 
-std::tuple<int64_t, int> parse_packet(const std::string& packet) {
-    auto start = packet.begin(), it = start;
+std::tuple<int64_t, int> parse_packet(const std::string& packet,
+                                      std::string::iterator it) {
+    auto start = it;
     int64_t value;
     std::vector<int64_t> values;
     int version = stoi(std::string(it, it + 3), nullptr, 2);
@@ -76,40 +54,33 @@ std::tuple<int64_t, int> parse_packet(const std::string& packet) {
     it += 6;
 
     if (packet_type == Op::LITERAL) {
-        std::string number_bits;
+        std::string value_bits;
         while (*it == '1') {
-            number_bits += std::string(it + 1, it + 5);
+            value_bits += std::string(it + 1, it + 5);
             it += 5;
         }
-        number_bits += std::string(it + 1, it + 5);
+        value_bits += std::string(it + 1, it + 5);
         it += 5;
-        value = stoll(number_bits, nullptr, 2);
+        value = stoll(value_bits, nullptr, 2);
 
-    } else if (*it == '0') {
+    } else if (*it == LengthType::BITS) {
         int total_bits = stoi(std::string(it + 1, it + 16), nullptr, 2);
         it += 16;
-        int used_bits = 0;
-        std::string packets(it, it + total_bits);
-        while (used_bits < total_bits) {
-            auto [value, length] = parse_packet(packets);
-            used_bits += length;
+        auto end = it + total_bits;
+        while (it != end) {
+            auto [value, length] = parse_packet(packet, it);
+            it += length;
             values.push_back(value);
-            packets.assign(it + used_bits, it + total_bits);
         }
-        it += total_bits;
 
-    } else if (*it == '1') {
+    } else if (*it == LengthType::PACKETS) {
         int total_packets = stoi(std::string(it + 1, it + 12), nullptr, 2);
         it += 12;
-        int used_bits = 0;
-        std::string packets(it, packet.end());
         for (int i = 0; i < total_packets; i++) {
-            auto [value, length] = parse_packet(packets);
-            used_bits += length;
+            auto [value, length] = parse_packet(packet, it);
+            it += length;
             values.push_back(value);
-            packets.assign(it + used_bits, packet.end());
         }
-        it += used_bits;
     }
 
     if (packet_type == Op::SUM) {
@@ -135,7 +106,7 @@ std::tuple<int64_t, int> parse_packet(const std::string& packet) {
 
 auto solve_puzzle() {
     auto packet = parse_input();
-    auto [solution, _] = parse_packet(packet);
+    auto [solution, _] = parse_packet(packet, packet.begin());
     return solution;
 }
 
