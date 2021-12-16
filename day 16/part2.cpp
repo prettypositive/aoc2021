@@ -84,7 +84,6 @@ std::tuple<int64_t, int> parse_packet(const std::string& packet) {
         number_bits += std::string(it + 1, it + 5);
         it += 5;
         value = stoll(number_bits, nullptr, 2);
-        return {value, (it - start)};
 
     } else if (*it == '0') {
         int total_bits = stoi(std::string(it + 1, it + 16), nullptr, 2);
@@ -130,7 +129,8 @@ std::tuple<int64_t, int> parse_packet(const std::string& packet) {
         value = (values[0] == values[1]) ? 1 : 0;
     }
 
-    return {value, (it - start)};
+    auto length = it - start;
+    return {value, length};
 }
 
 auto solve_puzzle() {
