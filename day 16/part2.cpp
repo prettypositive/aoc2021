@@ -44,8 +44,7 @@ auto parse_input() {
     return packet;
 }
 
-std::tuple<int64_t, int> parse_packet(const std::string& packet,
-                                      std::string::iterator it) {
+int64_t parse_packet(const std::string& packet, std::string::iterator& it) {
     auto start = it;
     int64_t value;
     std::vector<int64_t> values;
@@ -68,18 +67,14 @@ std::tuple<int64_t, int> parse_packet(const std::string& packet,
         it += 16;
         auto end = it + total_bits;
         while (it != end) {
-            auto [value, length] = parse_packet(packet, it);
-            it += length;
-            values.push_back(value);
+            values.push_back(parse_packet(packet, it));
         }
 
     } else if (*it == LengthType::PACKETS) {
         int total_packets = stoi(std::string(it + 1, it + 12), nullptr, 2);
         it += 12;
         for (int i = 0; i < total_packets; i++) {
-            auto [value, length] = parse_packet(packet, it);
-            it += length;
-            values.push_back(value);
+            values.push_back(parse_packet(packet, it));
         }
     }
 
@@ -100,13 +95,13 @@ std::tuple<int64_t, int> parse_packet(const std::string& packet,
         value = (values[0] == values[1]) ? 1 : 0;
     }
 
-    auto length = it - start;
-    return {value, length};
+    return value;
 }
 
 auto solve_puzzle() {
     auto packet = parse_input();
-    auto [solution, _] = parse_packet(packet, packet.begin());
+    auto it = packet.begin();
+    auto solution = parse_packet(packet, it);
     return solution;
 }
 
