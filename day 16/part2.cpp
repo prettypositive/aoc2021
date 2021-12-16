@@ -24,8 +24,8 @@ enum LengthType {
     PACKETS = '1',
 };
 
-std::vector<int64_t> handle_bits_length(std::string::iterator& it);
-std::vector<int64_t> handle_packets_length(std::string::iterator& it);
+auto handle_bits_length(std::string::iterator& it);
+auto handle_packets_length(std::string::iterator& it);
 int64_t parse_packet(std::string::iterator& it);
 
 std::string hex_char_to_binary(const char c) {
@@ -78,7 +78,7 @@ int64_t read_value(std::string::iterator& it) {
     return stoll(value_bits, nullptr, 2);
 }
 
-std::vector<int64_t> handle_bits_length(std::string::iterator& it) {
+auto handle_bits_length(std::string::iterator& it) {
     std::vector<int64_t> values;
     int total_bits = stoi(std::string(it + 1, it + 16), nullptr, 2);
     it += 16;
@@ -89,7 +89,7 @@ std::vector<int64_t> handle_bits_length(std::string::iterator& it) {
     return values;
 }
 
-std::vector<int64_t> handle_packets_length(std::string::iterator& it) {
+auto handle_packets_length(std::string::iterator& it) {
     std::vector<int64_t> values;
     int total_packets = stoi(std::string(it + 1, it + 12), nullptr, 2);
     it += 12;
