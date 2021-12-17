@@ -65,6 +65,7 @@ int64_t do_op(const std::vector<int64_t>& values, const int packet_type) {
         case Op::EQUAL:
             return (values[0] == values[1]) ? 1 : 0;
     }
+
     throw std::invalid_argument("invalid packet type");
 }
 
