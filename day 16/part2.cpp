@@ -104,10 +104,9 @@ int64_t parse_packet(std::string::iterator& it) {
     int packet_type = stoi(std::string(it + 3, it + 6), nullptr, 2);
     it += 6;
 
-    if (packet_type == Op::LITERAL) return read_value(it);
-
-    std::vector<int64_t> values;
-    if (*it == LengthType::BITS)
+    if (packet_type == Op::LITERAL)
+        return read_value(it);
+    else if (*it == LengthType::BITS)
         return do_op(handle_bits_length(it), packet_type);
     else if (*it == LengthType::PACKETS)
         return do_op(handle_packets_length(it), packet_type);
