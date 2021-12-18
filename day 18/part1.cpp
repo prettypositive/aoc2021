@@ -133,7 +133,7 @@ auto add_snail_numbers(const std::string& a, const std::string& b) {
 
 int calculate_magnitude(std::string& snail_number) {
     auto it = snail_number.begin();
-    while (true) {
+    while (!std::isdigit(snail_number[0])) {
         for (auto it = snail_number.begin(); it < snail_number.end(); ++it) {
             if (*it == '[') {
                 auto start = it;
@@ -150,16 +150,14 @@ int calculate_magnitude(std::string& snail_number) {
                 break;
             }
         }
-        std::cout << snail_number << std::endl;
-        if (std::isdigit(snail_number[0])) return stoi(snail_number);
     }
+    return stoi(snail_number);
 }
 
 auto solve_puzzle() {
     auto snail_numbers = parse_input();
     auto sum = std::accumulate(snail_numbers.begin() + 1, snail_numbers.end(),
                                snail_numbers.front(), add_snail_numbers);
-    std::cout << sum << std::endl;
     return calculate_magnitude(sum);
 }
 
