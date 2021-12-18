@@ -47,7 +47,7 @@ number_t find_too_large(std::string& sum) {
 
 number_t find_right_number(std::string& sum, std::string::iterator it) {
     // returns a pair of iterators to the beginning and end of the first number
-    // to the right of given iterator, otherwise end()
+    // to the right of given iterator
     it += 1;
     while (it != sum.end()) {
         auto start = it;
@@ -63,10 +63,10 @@ number_t find_right_number(std::string& sum, std::string::iterator it) {
 }
 
 number_t find_left_number(std::string& sum, std::string::iterator it) {
+    // returns a pair of iterators to the beginning and end of the first
+    // number to the left of given iterator
     it -= 1;
     while (it != sum.begin()) {
-        // returns a pair of iterators to the beginning and end of the first
-        // number to the left of given iterator, otherwise begin()
         auto start = it;
         auto end = it;
         while (std::isdigit(*it)) {
