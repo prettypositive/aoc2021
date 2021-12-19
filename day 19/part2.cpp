@@ -130,6 +130,7 @@ int distance(const Point& a, const Point& b) {
 }
 
 auto solve_puzzle() {
+    std::srand(std::time(nullptr));
     auto scanners = parse_input();
     scanners[0].position = Point(0, 0, 0);
     scanners[0].fixed_beacons = scanners[0].beacons;
@@ -142,39 +143,36 @@ auto solve_puzzle() {
                 for (const auto& orientation : scanner.all_orientations) {
                     scanner.beacons = orientation;
                     for (const auto& beacon : scanner.beacons) {
-                        for (int j = 0; j < scanners[i].fixed_beacons.size();
-                             j++) {
-                            int x_diff =
-                                scanners[i].fixed_beacons[j].x - beacon.x;
-                            int y_diff =
-                                scanners[i].fixed_beacons[j].y - beacon.y;
-                            int z_diff =
-                                scanners[i].fixed_beacons[j].z - beacon.z;
-                            scanner.shift_all_beacons(x_diff, y_diff, z_diff);
-                            std::unordered_set<Point, Point::hash> cmp(
-                                scanners[i].fixed_beacons.begin(),
-                                scanners[i].fixed_beacons.end());
-                            int matches = 0;
-                            for (const auto& beacon : scanner.beacons) {
-                                if (cmp.contains(beacon)) matches += 1;
-                            }
-                            if (matches >= 12) {
-                                scanner.position =
-                                    Point(x_diff, y_diff, z_diff);
-                                scanner.fixed_beacons = scanner.beacons;
-                                scanner.fixed = true;
-                                break;
-                            }
-                            scanner.shift_all_beacons(-x_diff, -y_diff,
-                                                      -z_diff);
+                        std::random_device rd;
+                        std::mt19937 gen(rd());
+                        std::uniform_int_distribution<> distrib(
+                            0, scanners[i].fixed_beacons.size() - 1);
+                        int j = distrib(gen);
+                        int x_diff = scanners[i].fixed_beacons[j].x - beacon.x;
+                        int y_diff = scanners[i].fixed_beacons[j].y - beacon.y;
+                        int z_diff = scanners[i].fixed_beacons[j].z - beacon.z;
+                        scanner.shift_all_beacons(x_diff, y_diff, z_diff);
+                        std::unordered_set<Point, Point::hash> cmp(
+                            scanners[i].fixed_beacons.begin(),
+                            scanners[i].fixed_beacons.end());
+                        int matches = 0;
+                        for (const auto& beacon : scanner.beacons) {
+                            if (cmp.contains(beacon)) matches += 1;
                         }
-                        if (scanner.fixed) break;
+                        if (matches >= 12) {
+                            scanner.position = Point(x_diff, y_diff, z_diff);
+                            scanner.fixed_beacons = scanner.beacons;
+                            scanner.fixed = true;
+                            break;
+                        }
+                        scanner.shift_all_beacons(-x_diff, -y_diff, -z_diff);
                     }
                     if (scanner.fixed) break;
                 }
             }
         }
     }
+
     std::vector<int> distances;
     for (int i = 0; i < scanners.size(); i++) {
         for (int j = 0; j < scanners.size(); j++) {
