@@ -142,32 +142,33 @@ auto solve_puzzle() {
                 if (scanner.fixed) continue;
                 for (const auto& orientation : scanner.all_orientations) {
                     scanner.beacons = orientation;
+                    std::random_device rd;
+                    std::mt19937 gen(rd());
+                    std::uniform_int_distribution<> distrib(
+                        0, scanners[i].fixed_beacons.size() - 1);
+                    int j = distrib(gen);
+                    int k = distrib(gen);
+                    int x_diff =
+                        scanners[i].fixed_beacons[j].x - scanner.beacons[k].x;
+                    int y_diff =
+                        scanners[i].fixed_beacons[j].y - scanner.beacons[k].y;
+                    int z_diff =
+                        scanners[i].fixed_beacons[j].z - scanner.beacons[k].z;
+                    scanner.shift_all_beacons(x_diff, y_diff, z_diff);
+                    std::unordered_set<Point, Point::hash> cmp(
+                        scanners[i].fixed_beacons.begin(),
+                        scanners[i].fixed_beacons.end());
+                    int matches = 0;
                     for (const auto& beacon : scanner.beacons) {
-                        std::random_device rd;
-                        std::mt19937 gen(rd());
-                        std::uniform_int_distribution<> distrib(
-                            0, scanners[i].fixed_beacons.size() - 1);
-                        int j = distrib(gen);
-                        int x_diff = scanners[i].fixed_beacons[j].x - beacon.x;
-                        int y_diff = scanners[i].fixed_beacons[j].y - beacon.y;
-                        int z_diff = scanners[i].fixed_beacons[j].z - beacon.z;
-                        scanner.shift_all_beacons(x_diff, y_diff, z_diff);
-                        std::unordered_set<Point, Point::hash> cmp(
-                            scanners[i].fixed_beacons.begin(),
-                            scanners[i].fixed_beacons.end());
-                        int matches = 0;
-                        for (const auto& beacon : scanner.beacons) {
-                            if (cmp.contains(beacon)) matches += 1;
-                        }
-                        if (matches >= 12) {
-                            scanner.position = Point(x_diff, y_diff, z_diff);
-                            scanner.fixed_beacons = scanner.beacons;
-                            scanner.fixed = true;
-                            break;
-                        }
-                        scanner.shift_all_beacons(-x_diff, -y_diff, -z_diff);
+                        if (cmp.contains(beacon)) matches += 1;
                     }
-                    if (scanner.fixed) break;
+                    if (matches >= 12) {
+                        scanner.position = Point(x_diff, y_diff, z_diff);
+                        scanner.fixed_beacons = scanner.beacons;
+                        scanner.fixed = true;
+                        break;
+                    }
+                    scanner.shift_all_beacons(-x_diff, -y_diff, -z_diff);
                 }
             }
         }
