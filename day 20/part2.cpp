@@ -86,44 +86,6 @@ auto enhance_image(const std::vector<char>& lookup, const image_t& image,
     return new_image;
 }
 
-auto convert_to_ascii(const image_t& image) {
-    std::vector<std::string> output_v;
-    int max_x, max_y, min_x, min_y;
-    max_x = std::max_element(image.begin(), image.end(),
-                             [](const auto& a, const auto& b) {
-                                 return a.first.x < b.first.x;
-                             })
-                ->first.x;
-    max_y = std::max_element(image.begin(), image.end(),
-                             [](const auto& a, const auto& b) {
-                                 return a.first.x < b.first.x;
-                             })
-                ->first.x;
-    min_x = std::min_element(image.begin(), image.end(),
-                             [](const auto& a, const auto& b) {
-                                 return a.first.x < b.first.x;
-                             })
-                ->first.x;
-    min_y = std::min_element(image.begin(), image.end(),
-                             [](const auto& a, const auto& b) {
-                                 return a.first.x < b.first.x;
-                             })
-                ->first.x;
-    for (int i = min_y; i < max_y + 1; i++) {
-        std::string blank(max_x - min_x + 1, ' ');
-        output_v.push_back(blank);
-    }
-    for (const auto& [point, value] : image) {
-        output_v[point.y - min_y][point.x - min_x] = (value == '0') ? '.' : '#';
-    }
-    std::string output;
-    for (const auto& line : output_v) {
-        output.append(line);
-        output += '\n';
-    }
-    return output;
-}
-
 auto solve_puzzle() {
     auto [lookup, image] = parse_input();
     for (int i = 0; i < 25; i++) {
@@ -134,7 +96,6 @@ auto solve_puzzle() {
     for (const auto& [_, value] : image) {
         sum += (value - '0');
     }
-    std::cout << convert_to_ascii(image);
     return sum;
 }
 
