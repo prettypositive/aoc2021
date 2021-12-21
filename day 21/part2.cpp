@@ -97,11 +97,11 @@ auto solve_puzzle() {
             }
         }
     }
-    std::vector<int64_t> counter = {0, 0};
+    std::array<int64_t, 2> counter = {};
     for (const auto& universe : complete_universes) {
         counter[universe.turn] += universe.count;
     }
-    return *std::max_element(counter.begin(), counter.end());
+    return std::max(counter[0], counter[1]);
 }
 
 int main() {
