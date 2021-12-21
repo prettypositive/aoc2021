@@ -60,49 +60,40 @@ auto make_move(Player& player, int distance) {
 
 auto solve_puzzle() {
     auto universes = parse_input();
-    int target = 21;
+    int target = 21;  // 10211328
     std::vector<Universe> complete_universes;
-    while (universes.size()) {
-        auto new_universes = universes;
-        for (auto& universe : universes) {
-            if (!universe.rolls_remaining) {
-                Universe new_universe = universe;
-                Player* player = (new_universe.turn == 0)
-                                     ? &new_universe.players.first
-                                     : &new_universe.players.second;
-                make_move(*player, new_universe.roll_sum);
+    std::unordered_map<Universe, int64_t, Universe::hash> universe_map;
+    while (!universes.empty()) {
+        for (auto it = universes.begin(); it != universes.end(); ++it) {
+            if (!it->rolls_remaining) {
+                universe_map.erase(*it);
+                Player* player =
+                    (it->turn == 0) ? &it->players.first : &it->players.second;
+                make_move(*player, it->roll_sum);
                 if (player->score >= target) {
-                    complete_universes.push_back(new_universe);
-                    new_universes.erase(std::find(
-                        new_universes.begin(), new_universes.end(), universe));
+                    complete_universes.push_back(*it);
                     continue;
                 }
-                new_universe.roll_sum = 0;
-                new_universe.rolls_remaining = 3;
-                new_universe.turn = abs(new_universe.turn - 1);
-                auto it = std::find(new_universes.begin(), new_universes.end(),
-                                    new_universe);
-                if (it != new_universes.end())
-                    it->count += new_universe.count;
-                else
-                    new_universes.push_back(new_universe);
+                it->roll_sum = 0;
+                it->rolls_remaining = 3;
+                it->turn = abs(it->turn - 1);
+                universe_map[*it] += it->count;
             } else {
                 for (int i = 1; i < 4; i++) {
-                    Universe new_universe = universe;
+                    Universe new_universe = *it;
                     new_universe.rolls_remaining -= 1;
                     new_universe.roll_sum += i;
-                    auto it = std::find(new_universes.begin(),
-                                        new_universes.end(), new_universe);
-                    if (it != new_universes.end())
-                        it->count += new_universe.count;
-                    else
-                        new_universes.push_back(new_universe);
+                    universe_map[new_universe] += new_universe.count;
+                    universe_map.erase(*it);
                 }
             }
-            new_universes.erase(std::find(new_universes.begin(),
-                                          new_universes.end(), universe));
         }
-        universes = new_universes;
+        universes.clear();
+        for (auto& [universe, count] : universe_map) {
+            Universe new_universe = universe;
+            new_universe.count = count;
+            universes.push_back(new_universe);
+        }
     }
     std::vector<int64_t> counter = {0, 0};
     for (const auto& universe : complete_universes) {
