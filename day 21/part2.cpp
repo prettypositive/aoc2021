@@ -60,31 +60,31 @@ auto make_move(Player& player, int distance) {
 
 auto solve_puzzle() {
     auto universes = parse_input();
-    int target = 21;  // 10211328
+    int target = 21;
     std::vector<Universe> complete_universes;
     std::unordered_map<Universe, int64_t, Universe::hash> universe_map;
     while (!universes.empty()) {
-        for (auto it = universes.begin(); it != universes.end(); ++it) {
-            if (!it->rolls_remaining) {
-                universe_map.erase(*it);
-                Player* player =
-                    (it->turn == 0) ? &it->players.first : &it->players.second;
-                make_move(*player, it->roll_sum);
+        for (auto universe = universes.begin(); universe != universes.end();
+             ++universe) {
+            universe_map.erase(*universe);
+            if (!universe->rolls_remaining) {
+                Player* player = (universe->turn == 0)
+                                     ? &universe->players.first
+                                     : &universe->players.second;
+                make_move(*player, universe->roll_sum);
                 if (player->score >= target) {
-                    complete_universes.push_back(*it);
+                    complete_universes.push_back(*universe);
                     continue;
                 }
-                it->roll_sum = 0;
-                it->rolls_remaining = 3;
-                it->turn = abs(it->turn - 1);
-                universe_map[*it] += it->count;
+                universe->roll_sum = 0;
+                universe->rolls_remaining = 3;
+                universe->turn = abs(universe->turn - 1);
+                universe_map[*universe] += universe->count;
             } else {
-                for (int i = 1; i < 4; i++) {
-                    Universe new_universe = *it;
-                    new_universe.rolls_remaining -= 1;
-                    new_universe.roll_sum += i;
-                    universe_map[new_universe] += new_universe.count;
-                    universe_map.erase(*it);
+                universe->rolls_remaining -= 1;
+                for (int i = 0; i < 3; i++) {
+                    universe->roll_sum += 1;
+                    universe_map[*universe] += universe->count;
                 }
             }
         }
