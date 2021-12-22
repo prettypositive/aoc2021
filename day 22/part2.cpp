@@ -1,10 +1,24 @@
 #include <bits/stdc++.h>
 
-struct Polygon {
+struct Cube {
     std::pair<int64_t, int64_t> x;
     std::pair<int64_t, int64_t> y;
     std::pair<int64_t, int64_t> z;
     bool on;
+};
+
+struct Checkpoint {
+    int value;
+    bool start;
+    int id;
+
+    Checkpoint() {}
+
+    Checkpoint(int value, bool start, int id) {
+        this->value = value;
+        this->start = start;
+        this->id = id;
+    }
 };
 
 auto parse_input() {
@@ -14,11 +28,11 @@ auto parse_input() {
         "^(on|off) x=(-?\\d+)\\.\\.(-?\\d+),"
         "y=(-?\\d+)\\.\\.(-?\\d+),"
         "z=(-?\\d+)\\.\\.(-?\\d+)$");
-    std::vector<Polygon> steps;
+    std::vector<Cube> steps;
     while (getline(input, line)) {
         std::smatch matches;
         std::regex_match(line, matches, regex);
-        Polygon cube;
+        Cube cube;
         cube.on = (matches[1] == "on") ? true : false;
         cube.x.first = stoll(matches[2]);
         cube.x.second = stoll(matches[3]);
@@ -31,151 +45,97 @@ auto parse_input() {
     return steps;
 }
 
-auto subtract_polygons(Polygon lhs, const Polygon& rhs) {
-    // returns up to 4 polygons that construct the new area of lhs after being
-    // intersected with rhs, returns original polygon if no intersection
-    std::vector<Polygon> result;
-    std::unordered_set<std::string> overlaps;
-    if (lhs.x.first >= rhs.x.first && lhs.x.first <= rhs.x.second)
-        overlaps.insert("x_min");
-    if (lhs.x.second >= rhs.x.first && lhs.x.second <= rhs.x.second)
-        overlaps.insert("x_max");
-    if (lhs.y.first >= rhs.y.first && lhs.y.first <= rhs.y.second)
-        overlaps.insert("y_min");
-    if (lhs.y.second >= rhs.y.first && lhs.y.second <= rhs.y.second)
-        overlaps.insert("y_max");
-    if (lhs.z.first >= rhs.z.first && lhs.z.first <= rhs.z.second)
-        overlaps.insert("z_min");
-    if (lhs.z.second >= rhs.z.first && lhs.z.second <= rhs.z.second)
-        overlaps.insert("z_max");
-    // overlap possibilities:
-    // 0 overlaps - return original
-    // 3 overlaps, 1 of each axis - return 3 polygons
-    // 4 overlaps, 1-1-2 - return 2 polygons
-    // 5 overlaps, 1-2-2 - return 1 polygon
-    // 6 overlaps - return empty vector
-    if (overlaps.size() == 0) {
-        result.push_back(lhs);
-    } else if (overlaps.size() == 3) {
-        Polygon polygon = lhs;
-        if (overlaps.contains("z_min")) {
-            polygon.z.first = rhs.z.second + 1;
-            lhs.z.second = rhs.z.second;
-        } else if (overlaps.contains("z_max")) {
-            polygon.z.second = rhs.z.first - 1;
-            lhs.z.first = rhs.z.first;
-        }
-        result.push_back(polygon);
-        polygon = lhs;
-        if (overlaps.contains("y_min")) {
-            polygon.y.first = rhs.y.second + 1;
-            lhs.y.second = rhs.y.second;
-        } else if (overlaps.contains("y_max")) {
-            polygon.y.second = rhs.y.first - 1;
-            lhs.y.first = rhs.y.first;
-        }
-        result.push_back(polygon);
-        polygon = lhs;
-        if (overlaps.contains("x_min")) {
-            polygon.x.first = rhs.x.second + 1;
-        } else if (overlaps.contains("x_max")) {
-            polygon.x.second = rhs.x.first - 1;
-        }
-        result.push_back(polygon);
-    } else if (overlaps.size() == 4) {
-        Polygon polygon;
-        if (overlaps.contains("z_min") && overlaps.contains("z_max")) {
-            polygon = lhs;
-            if (overlaps.contains("y_min")) {
-                polygon.y.first = rhs.y.second + 1;
-                lhs.y.second = rhs.y.second;
-            } else if (overlaps.contains("y_max")) {
-                polygon.y.second = rhs.y.first - 1;
-                lhs.y.first = rhs.y.first;
-            }
-            result.push_back(polygon);
-            polygon = lhs;
-            if (overlaps.contains("x_min")) {
-                polygon.x.first = rhs.x.second + 1;
-            } else if (overlaps.contains("x_max")) {
-                polygon.x.second = rhs.x.first - 1;
-            }
-            result.push_back(polygon);
-        } else if (overlaps.contains("y_min") && overlaps.contains("y_max")) {
-            polygon = lhs;
-            if (overlaps.contains("z_min")) {
-                polygon.z.first = rhs.z.second + 1;
-                lhs.z.second = rhs.z.second;
-            } else if (overlaps.contains("z_max")) {
-                polygon.z.second = rhs.z.first - 1;
-                lhs.z.first = rhs.z.first;
-            }
-            result.push_back(polygon);
-            polygon = lhs;
-            if (overlaps.contains("x_min")) {
-                polygon.x.first = rhs.x.second + 1;
-            } else if (overlaps.contains("x_max")) {
-                polygon.x.second = rhs.x.first - 1;
-            }
-            result.push_back(polygon);
-        } else if (overlaps.contains("x_min") && overlaps.contains("x_max")) {
-            polygon = lhs;
-            if (overlaps.contains("z_min")) {
-                polygon.z.first = rhs.z.second + 1;
-                lhs.z.second = rhs.z.second;
-            } else if (overlaps.contains("z_max")) {
-                polygon.z.second = rhs.z.first - 1;
-                lhs.z.first = rhs.z.first;
-            }
-            result.push_back(polygon);
-            polygon = lhs;
-            if (overlaps.contains("y_min")) {
-                polygon.y.first = rhs.y.second + 1;
-            } else if (overlaps.contains("y_max")) {
-                polygon.y.second = rhs.y.first - 1;
-            }
-            result.push_back(polygon);
-        }
-    } else if (overlaps.size() == 5) {
-        Polygon polygon = lhs;
-        if (!overlaps.contains("z_min")) {
-            polygon.z.second = rhs.z.first - 1;
-        } else if (!overlaps.contains("z_max")) {
-            polygon.z.first = rhs.z.second + 1;
-        } else if (!overlaps.contains("y_min")) {
-            polygon.y.second = rhs.y.first - 1;
-        } else if (!overlaps.contains("y_max")) {
-            polygon.y.first = rhs.y.second + 1;
-        } else if (!overlaps.contains("x_min")) {
-            polygon.x.second = rhs.x.first - 1;
-        } else if (!overlaps.contains("x_max")) {
-            polygon.x.first = rhs.x.second + 1;
-        }
-        result.push_back(polygon);
-    }
-
-    return result;
-}
-
 auto solve_puzzle() {
+    // https://stackoverflow.com/questions/66135217/how-to-subdivide-set-of-overlapping-aabb-into-non-overlapping-set-of-aabbs
     auto steps = parse_input();
-    std::vector<Polygon> grid;
-    for (const auto& step : steps) {
-        std::vector<Polygon> new_grid;
-        for (const auto& polygon : grid) {
-            for (const auto& new_polygon : subtract_polygons(polygon, step)) {
-                new_grid.push_back(new_polygon);
+    std::vector<Checkpoint> x_checkpoints;
+    for (int i = 0; i < steps.size(); i++) {
+        x_checkpoints.push_back(Checkpoint(steps[i].x.first, true, i));
+        x_checkpoints.push_back(Checkpoint(steps[i].x.second, false, i));
+    }
+    std::sort(x_checkpoints.begin(), x_checkpoints.end(),
+              [](const auto& a, const auto& b) { return a.value < b.value; });
+    std::vector<std::pair<std::set<int64_t>, int64_t>> x_intervals;
+    std::pair<std::set<int64_t>, int64_t> interval;
+    Checkpoint prev_checkpoint;
+    for (const auto& checkpoint : x_checkpoints) {
+        interval.second = checkpoint.value - prev_checkpoint.value;
+        if (checkpoint.start && !prev_checkpoint.start) interval.second -= 1;
+        if (!checkpoint.start && prev_checkpoint.start) interval.second += 1;
+        if (!interval.first.empty() && interval.second != 0)
+            x_intervals.push_back(interval);
+        if (checkpoint.start)
+            interval.first.insert(checkpoint.id);
+        else
+            interval.first.erase(checkpoint.id);
+
+        prev_checkpoint = checkpoint;
+    }
+
+    std::vector<Checkpoint> y_checkpoints;
+    for (int i = 0; i < steps.size(); i++) {
+        y_checkpoints.push_back(Checkpoint(steps[i].y.first, true, i));
+        y_checkpoints.push_back(Checkpoint(steps[i].y.second, false, i));
+    }
+    std::sort(y_checkpoints.begin(), y_checkpoints.end(),
+              [](const auto& a, const auto& b) { return a.value < b.value; });
+    std::vector<std::pair<std::set<int64_t>, int64_t>> y_intervals;
+    for (const auto& checkpoint : y_checkpoints) {
+        interval.second = checkpoint.value - prev_checkpoint.value;
+        if (checkpoint.start && !prev_checkpoint.start) interval.second -= 1;
+        if (!checkpoint.start && prev_checkpoint.start) interval.second += 1;
+        if (!interval.first.empty() && interval.second != 0)
+            y_intervals.push_back(interval);
+        if (checkpoint.start)
+            interval.first.insert(checkpoint.id);
+        else
+            interval.first.erase(checkpoint.id);
+
+        prev_checkpoint = checkpoint;
+    }
+
+    std::vector<Checkpoint> z_checkpoints;
+    for (int i = 0; i < steps.size(); i++) {
+        z_checkpoints.push_back(Checkpoint(steps[i].z.first, true, i));
+        z_checkpoints.push_back(Checkpoint(steps[i].z.second, false, i));
+    }
+    std::sort(z_checkpoints.begin(), z_checkpoints.end(),
+              [](const auto& a, const auto& b) { return a.value < b.value; });
+    std::vector<std::pair<std::set<int64_t>, int64_t>> z_intervals;
+    for (const auto& checkpoint : z_checkpoints) {
+        interval.second = checkpoint.value - prev_checkpoint.value;
+        if (checkpoint.start && !prev_checkpoint.start) interval.second -= 1;
+        if (!checkpoint.start && prev_checkpoint.start) interval.second += 1;
+        if (!interval.first.empty() && interval.second != 0)
+            z_intervals.push_back(interval);
+        if (checkpoint.start)
+            interval.first.insert(checkpoint.id);
+        else
+            interval.first.erase(checkpoint.id);
+
+        prev_checkpoint = checkpoint;
+    }
+
+    int64_t total_area = 0;
+    for (int i = 0; i < x_intervals.size(); i++) {
+        std::cout << i << std::endl;
+        for (int j = 0; j < y_intervals.size(); j++) {
+            for (int k = 0; k < z_intervals.size(); k++) {
+                std::vector<int64_t> res1, res2;
+                std::set_intersection(
+                    x_intervals[i].first.begin(), x_intervals[i].first.end(),
+                    y_intervals[j].first.begin(), y_intervals[j].first.end(),
+                    std::back_inserter(res1));
+                if (res1.empty()) continue;
+                std::set_intersection(z_intervals[k].first.begin(),
+                                      z_intervals[k].first.end(), res1.begin(),
+                                      res1.end(), std::back_inserter(res2));
+                if (res2.empty()) continue;
+                int64_t area = x_intervals[i].second * y_intervals[j].second *
+                               z_intervals[k].second;
+                if (steps[res2.back()].on) total_area += area;
             }
         }
-        if (step.on) new_grid.push_back(step);
-        grid = new_grid;
-    }
-    int64_t total_area;
-    for (const auto& polygon : grid) {
-        int64_t area = (((polygon.x.second - polygon.x.first) + 1) *
-                        ((polygon.y.second - polygon.y.first) + 1) *
-                        ((polygon.z.second - polygon.z.first) + 1));
-        total_area += area;
     }
     return total_area;
 }
