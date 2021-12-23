@@ -50,6 +50,20 @@ struct GameState {
     bool operator==(const GameState& other) const {
         return (hallway == other.hallway && homes == other.homes);
     }
+
+    struct hash {
+        size_t operator()(const GameState& game) const {
+            size_t hash = 17;
+            std::string homes;
+            for (const auto& [_, home] : game.homes) {
+                homes += std::string(home.begin(), home.end());
+            }
+            hash = hash * 31 + std::hash<std::string>{}(std::string(
+                                   game.hallway.begin(), game.hallway.end()));
+            hash = hash * 31 + std::hash<std::string>{}(homes);
+            return hash;
+        }
+    };
 };
 
 struct Move {
@@ -135,21 +149,24 @@ GameState make_move(GameState game, const Move& move) {
     return game;
 }
 
-void dfs_solve(const GameState& game, int& best_score, const int& score = 0) {
+void dfs_solve(const GameState& game,
+               std::unordered_map<GameState, int, GameState::hash>& cache,
+               int& best_score, const int& score = 0) {
     if (score >= best_score) return;
     if (game == *game.solved) {
-        if (score < best_score) std::cout << score << std::endl;
         best_score = score;
         return;
     }
+    if (cache.contains(game) && score >= cache[game]) return;
     std::vector<Move> legal_moves;
     find_hallway_moves(game, legal_moves);
     for (const auto& [home, _] : game.homes) {
         find_home_moves(game, home, legal_moves);
     }
     for (const auto& move : legal_moves) {
-        dfs_solve(make_move(game, move), best_score, score + move.cost);
+        dfs_solve(make_move(game, move), cache, best_score, score + move.cost);
     }
+    cache[game] = score;
     return;
 }
 
@@ -165,7 +182,8 @@ auto solve_puzzle() {
     solved.homes['D'] = {'D', 'D', 'D', 'D'};
     game.solved = &solved;
     int best_score = INT_MAX;
-    dfs_solve(game, best_score);
+    std::unordered_map<GameState, int, GameState::hash> cache;
+    dfs_solve(game, cache, best_score);
     return best_score;
 }
 
