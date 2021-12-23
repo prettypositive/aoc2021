@@ -7,6 +7,39 @@ std::unordered_map<char, std::unordered_map<int, int>> move_costs = {
     {'D', {{0, 12}, {1, 11}, {2, 9}, {3, 7}, {4, 5}, {5, 5}, {6, 6}}}};
 std::unordered_map<char, int> piece_costs = {
     {'A', 1}, {'B', 10}, {'C', 100}, {'D', 1000}};
+std::unordered_map<char, std::unordered_map<int, std::vector<int>>> blockers = {
+    {'A',
+     {{0, {1}},
+      {1, {}},
+      {2, {}},
+      {3, {2}},
+      {4, {2, 3}},
+      {5, {2, 3, 4}},
+      {6, {2, 3, 4, 5}}}},
+    {'B',
+     {{0, {1, 2}},
+      {1, {2}},
+      {2, {}},
+      {3, {}},
+      {4, {3}},
+      {5, {3, 4}},
+      {6, {3, 4, 5}}}},
+    {'C',
+     {{0, {1, 2, 3}},
+      {1, {2, 3}},
+      {2, {3}},
+      {3, {}},
+      {4, {}},
+      {5, {4}},
+      {6, {4, 5}}}},
+    {'D',
+     {{0, {1, 2, 3, 4}},
+      {1, {2, 3, 4}},
+      {2, {3, 4}},
+      {3, {4}},
+      {4, {}},
+      {5, {}},
+      {6, {5}}}}};
 
 struct GameState {
     // A between 1-2, B between 2-3, C between 3-4, D between 4-5
@@ -28,27 +61,16 @@ struct Move {
 
 bool is_path_clear(const GameState& game, const std::pair<char, int>& source,
                    const std::pair<char, int>& destination) {
-    std::unordered_map<char, std::unordered_map<int, std::vector<int>>>
-        blockers;
-    blockers['A'] = {{0, {1}},    {1, {}},        {2, {}},          {3, {2}},
-                     {4, {2, 3}}, {5, {2, 3, 4}}, {6, {2, 3, 4, 5}}};
-    blockers['B'] = {{0, {1, 2}}, {1, {2}},    {2, {}},       {3, {}},
-                     {4, {3}},    {5, {3, 4}}, {6, {3, 4, 5}}};
-    blockers['C'] = {{0, {1, 2, 3}}, {1, {2, 3}}, {2, {3}},   {3, {}},
-                     {4, {}},        {5, {4}},    {6, {4, 5}}};
-    blockers['D'] = {{0, {1, 2, 3, 4}}, {1, {2, 3, 4}}, {2, {3, 4}}, {3, {4}},
-                     {4, {}},           {5, {}},        {6, {5}}};
-    bool clear = true;
     if (source.first == 'H') {
         for (const auto& blocker : blockers[destination.first][source.second]) {
-            if (game.hallway[blocker]) clear = false;
+            if (game.hallway[blocker]) return false;
         }
     } else {
         for (const auto& blocker : blockers[source.first][destination.second]) {
-            if (game.hallway[blocker]) clear = false;
+            if (game.hallway[blocker]) return false;
         }
     }
-    return (clear) ? true : false;
+    return true;
 }
 
 void find_hallway_moves(const GameState& game, std::vector<Move>& legal_moves) {
