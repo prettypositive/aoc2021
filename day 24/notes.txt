@@ -1,4 +1,20 @@
-2 types
+1   stack.push(input+13)
+2   stack.push(input+10)
+3   stack.push(input+5)
+4   if (input = stack.last-11): stack.pop()
+5   stack.push(input+5)
+6   if (input = stack.last): stack.pop()
+7   stack.push(input+4)
+8   stack.push(input+11)
+9   stack.push(input+1)
+0   if (input = stack.last-6): stack.pop()
+11  if (input = stack.last-10): stack.pop()
+12  if (input = stack.last-12): stack.pop()
+13  if (input = stack.last-3): stack.pop()
+14  if (input = stack.last-5): stack.pop()
+
+1 2 9 3 4 9 9 8 9 4 9 1 9 9
+
 type 1: 1, 2, 3, 5, 7, 8, 9
 type 2: 4, 6, 10, 11, 12, 13, 14
 
