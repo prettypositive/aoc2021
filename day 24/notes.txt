@@ -1,0 +1,82 @@
+2 types
+type 1: 1, 2, 3, 5, 7, 8, 9
+type 2: 4, 6, 10, 11, 12, 13, 14
+
+w = input
+z = w + 13
+
+w = input
+z *= 26
+z += (w+10)
+
+w = input
+z *= 26
+z += (w+5)
+
+w = input
+x = z % 26
+z /= 26
+if (x - 11) = w: continue
+z *= 26
+z += (w+14)
+
+w = input
+z *= 26
+z += (w+5)
+
+w = input
+x = z % 26
+z /= 26
+if x = w: continue
+z *= 26
+z += (w+15)
+
+w = input
+z *= 26
+z += (w+4)
+
+w = input
+z *= 26
+z += (w+11)
+
+w = input
+z *= 26
+z += (w+1)
+
+MIN Z HERE = 2821241
+MAX Z HERE = 6623281
+
+w = input
+x = z % 26
+z /= 26
+if (x - 6) = w: continue
+z *= 26
+z += (w+15)
+
+w = input
+x = z % 26
+z /= 26
+if (x - 10) = w: continue
+z *= 26
+z += (w+12)
+
+w = input
+x = z % 26
+z /= 26
+if (x - 12) = w: continue
+z *= 26
+z += (w+8)
+
+w = input
+x = z % 26
+z /= 26
+if (x - 3) = w: continue
+z *= 26
+z += (w+14)
+
+w = input
+x = z % 26
+z /= 26
+if (x - 5) = w: continue
+z *= 26
+z += (w+9)
